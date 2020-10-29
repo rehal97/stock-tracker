@@ -47,6 +47,8 @@ const TickerSearch = () => {
 
     return (
         <div>
+            <h1>Stock Search</h1>
+
             <InputGroup className="mb-3">
                 <FormControl
                 placeholder="Search Ticker"
@@ -55,7 +57,7 @@ const TickerSearch = () => {
                 onChange={event => setInputTicker(event.target.value)}
                 />
             </InputGroup>
-            <h4>Searching for {inputTicker.toUpperCase()}</h4>
+            {inputTicker !== '' && <h4>Searching for {inputTicker.toUpperCase()}</h4>}
             <div>
                 {renderSearchResults}
 
