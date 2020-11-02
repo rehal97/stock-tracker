@@ -1,4 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+// import { Redirect } from 'react-router-dom';
+
 import InputGroup from 'react-bootstrap/InputGroup';
 import FormControl from 'react-bootstrap/FormControl';
 import ListGroup from 'react-bootstrap/ListGroup';
@@ -6,7 +8,7 @@ import ListGroup from 'react-bootstrap/ListGroup';
 
 import {getStock, symbolSearch} from '../../alpha-stocks';
 
-const TickerSearch = () => {
+const TickerSearch = (props) => {
     const [inputTicker, setInputTicker] = useState('');
     const [searchResults, setSearchResults] = useState({});
 
@@ -28,16 +30,27 @@ const TickerSearch = () => {
         }
     }, [inputTicker, inputRef]);
 
+    const redirectToTickerPage = (symbol) => {
+        console.log('path: ' + '/ticker/' + symbol);
+        props.history.push({
+            pathname: '/ticker/' + symbol,
+            ticker: symbol
+        });
+    }
+
     const renderSearchResults = useMemo (() => {
-        console.log(searchResults)
-        if (searchResults.['bestMatches'] !== undefined) {
+        const bestMatches = searchResults.['bestMatches'];
+        if (bestMatches !== undefined) {
             return(
                 <ListGroup>
-                {searchResults.['bestMatches'] && searchResults.['bestMatches'].map(result => (
-                    <ListGroup.Item key={result.['1. symbol']}>
-                        {result.['1. symbol']}
-                    </ListGroup.Item>
-                ))}   
+                {bestMatches && bestMatches.map(result => {
+                    let symbol = result.['1. symbol'];
+                    return (
+                        <ListGroup.Item key={symbol} action onClick={() => redirectToTickerPage(symbol)}>
+                            {symbol}
+                        </ListGroup.Item>
+                    )
+                })}   
             </ListGroup>
             )
         } else {
@@ -60,7 +73,6 @@ const TickerSearch = () => {
             {inputTicker !== '' && <h4>Searching for {inputTicker.toUpperCase()}</h4>}
             <div>
                 {renderSearchResults}
-
             </div>
         </div>
     )

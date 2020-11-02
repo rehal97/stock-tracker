@@ -1,16 +1,17 @@
 import React from 'react';
-import { Route, Switch, Redirect } from 'react-router-dom';
+import { Route, Switch, Redirect, withRouter } from 'react-router-dom';
 
 import './App.css';
 
 import TickerSearch from './components/TickerSearch/TickerSearch';
+import TickerInfo from './components/TickerInfo/TickerInfo';
 
-const App = () => {
+const App = (props) => {
 
   let routes = (
     <Switch>
       <Route path="/" exact component={TickerSearch} />
-      {/* <Route path="/ticker" component={} /> */}
+      <Route path={'/ticker'} component={TickerInfo} />
       <Redirect to="/" />
     </Switch>
   )
@@ -22,4 +23,4 @@ const App = () => {
   );
 }
 
-export default App;
+export default withRouter(App);
