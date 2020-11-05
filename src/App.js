@@ -4,15 +4,15 @@ import { Route, Switch, Redirect, withRouter } from 'react-router-dom';
 import './App.css';
 
 import Layout from './hoc/Layout/Layout';
-import TickerSearch from './components/TickerSearch/TickerSearch';
-import TickerInfo from './components/TickerInfo/TickerInfo';
+import SymbolSearch from './components/SymbolSearch/SymbolSearch';
+import SymbolInfo from './components/SymbolInfo/SymbolInfo';
 
 const App = (props) => {
 
   let routes = (
     <Switch>
-      <Route path="/" exact component={TickerSearch} />
-      <Route path={'/ticker'} component={TickerInfo} />
+      <Route path="/" exact component={SymbolSearch} />
+      <Route path={'/symbol'} component={SymbolInfo} />
       <Redirect to="/" />
     </Switch>
   )

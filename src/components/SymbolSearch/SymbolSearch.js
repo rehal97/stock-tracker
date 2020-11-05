@@ -9,16 +9,16 @@ import ListGroup from 'react-bootstrap/ListGroup';
 import {symbolSearch} from '../../alpha-stocks';
 import Aux from '../../hoc/Aux/Aux';
 
-const TickerSearch = (props) => {
-    const [inputTicker, setInputTicker] = useState('');
+const SymbolSearch = (props) => {
+    const [inputSymbol, setInputSymbol] = useState('');
     const [searchResults, setSearchResults] = useState({});
 
     const inputRef = useRef();
 
     useEffect(() => {
         const timer = setTimeout(async () => {
-            if (inputTicker === inputRef.current.value) {
-                symbolSearch(inputTicker).then( res => {
+            if (inputSymbol === inputRef.current.value) {
+                symbolSearch(inputSymbol).then( res => {
                     if (res && !res['Error Message']) {
                         setSearchResults(res);
                         // console.log(res)
@@ -29,13 +29,13 @@ const TickerSearch = (props) => {
         return () => {
           clearTimeout(timer);
         }
-    }, [inputTicker, inputRef]);
+    }, [inputSymbol, inputRef]);
 
-    const redirectToTickerPage = (symbol) => {
-        console.log('path: ' + '/ticker/' + symbol);
+    const redirectToSymbolPage = (symbol) => {
+        console.log('path: ' + '/symbol/' + symbol);
         props.history.push({
-            pathname: '/ticker/' + symbol,
-            ticker: symbol
+            pathname: '/symbol/' + symbol,
+            symbol: symbol
         });
     }
 
@@ -47,7 +47,7 @@ const TickerSearch = (props) => {
                 {bestMatches && bestMatches.map(result => {
                     let symbol = result.['1. symbol'];
                     return (
-                        <ListGroup.Item key={symbol} action onClick={() => redirectToTickerPage(symbol)}>
+                        <ListGroup.Item key={symbol} action onClick={() => redirectToSymbolPage(symbol)}>
                             {symbol}
                         </ListGroup.Item>
                     )
@@ -65,13 +65,13 @@ const TickerSearch = (props) => {
 
             <InputGroup className="mb-3">
                 <FormControl
-                placeholder="Search Ticker"
-                aria-label="ticker"
+                placeholder="Search Symbol"
+                aria-label="symbol"
                 ref={inputRef}
-                onChange={event => setInputTicker(event.target.value)}
+                onChange={event => setInputSymbol(event.target.value)}
                 />
             </InputGroup>
-            {inputTicker !== '' && <h4>Searching for {inputTicker.toUpperCase()}</h4>}
+            {inputSymbol !== '' && <h4>Searching for {inputSymbol.toUpperCase()}</h4>}
             <div>
                 {renderSearchResults}
             </div>
@@ -79,4 +79,4 @@ const TickerSearch = (props) => {
     )
 }
 
-export default TickerSearch;
+export default SymbolSearch;

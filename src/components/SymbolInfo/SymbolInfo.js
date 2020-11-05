@@ -24,17 +24,17 @@ const mapQuoteData = (data) => {
     return quoteData;
 }
 
-const TickerInfo = (props) => {
+const SymbolInfo = (props) => {
 
     const [symbol, setSymbol] = useState({});
     const [quoteData, setQuoteData] = useState({});
 
     useEffect(() => {
-        symbolInfo(props.location.ticker).then(res => {
+        symbolInfo(props.location.symbol).then(res => {
             setSymbol(res);
         });
 
-        getStock(props.location.ticker).then(res => {
+        getStock(props.location.symbol).then(res => {
             const data = mapQuoteData(res);
             setQuoteData(data);
         })
@@ -68,4 +68,4 @@ const TickerInfo = (props) => {
     )
 }
 
-export default TickerInfo;
+export default SymbolInfo;
