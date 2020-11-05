@@ -5,25 +5,12 @@ const instance = axios.create({
 });
 
 export const getStock = async (symbol) => {
-
-    const func = 'TIME_SERIES_DAILY';
-    // const symbol = symbol;
-    const outputsize = 'compact';
+    const func = 'GLOBAL_QUOTE';
     const apikey = process.env.REACT_APP_ALPHA_KEY;
+    const queryParams = '?function=' + func + '&symbol=' + symbol + '&apikey=' + apikey;
 
-    const queryParams = '?function=' + func + '&symbol=' + symbol + '&outputsize=' + outputsize + '&apikey=' + apikey;
-    
-      
-    var tzoffset = (new Date()).getTimezoneOffset() * 60000; //offset in milliseconds
-    var today = (new Date(Date.now() - tzoffset)).toISOString().slice(0, -1).slice(0,10);
-
-    // let stock = await instance.get(queryParams)
-    instance.get(queryParams).then(res => {
-        // console.log(res);
-        if(!res.data.['Error Message']) {
-            // console.log(res.data['Time Series (Daily)'].[today]);
-        }
-    })
+    const res = await instance.get(queryParams)
+    return res.data['Global Quote'];
 }
 
 export const symbolSearch = async (keywords) => {

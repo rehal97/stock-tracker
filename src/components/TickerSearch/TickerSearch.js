@@ -6,7 +6,8 @@ import FormControl from 'react-bootstrap/FormControl';
 import ListGroup from 'react-bootstrap/ListGroup';
 
 
-import {getStock, symbolSearch} from '../../alpha-stocks';
+import {symbolSearch} from '../../alpha-stocks';
+import Aux from '../../hoc/Aux/Aux';
 
 const TickerSearch = (props) => {
     const [inputTicker, setInputTicker] = useState('');
@@ -51,7 +52,7 @@ const TickerSearch = (props) => {
                         </ListGroup.Item>
                     )
                 })}   
-            </ListGroup>
+                </ListGroup>
             )
         } else {
             return null
@@ -59,7 +60,7 @@ const TickerSearch = (props) => {
     }, [searchResults]);
 
     return (
-        <div>
+        <Aux>
             <h1>Stock Search</h1>
 
             <InputGroup className="mb-3">
@@ -74,7 +75,7 @@ const TickerSearch = (props) => {
             <div>
                 {renderSearchResults}
             </div>
-        </div>
+        </Aux>
     )
 }
 

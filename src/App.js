@@ -3,6 +3,7 @@ import { Route, Switch, Redirect, withRouter } from 'react-router-dom';
 
 import './App.css';
 
+import Layout from './hoc/Layout/Layout';
 import TickerSearch from './components/TickerSearch/TickerSearch';
 import TickerInfo from './components/TickerInfo/TickerInfo';
 
@@ -17,9 +18,9 @@ const App = (props) => {
   )
 
   return (
-    <div className="App">
+    <Layout>
       {routes}
-    </div>
+    </Layout>
   );
 }
 
