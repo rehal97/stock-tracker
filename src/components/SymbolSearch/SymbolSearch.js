@@ -32,7 +32,7 @@ const SymbolSearch = (props) => {
     }, [inputSymbol, inputRef]);
 
     const redirectToSymbolPage = (symbol) => {
-        console.log('path: ' + '/symbol/' + symbol);
+        // console.log('path: ' + '/symbol/' + symbol);
         props.history.push({
             pathname: '/symbol/' + symbol,
             symbol: symbol
@@ -46,9 +46,10 @@ const SymbolSearch = (props) => {
                 <ListGroup>
                 {bestMatches && bestMatches.map(result => {
                     let symbol = result.['1. symbol'];
+                    let name = result.['2. name'];
                     return (
                         <ListGroup.Item key={symbol} action onClick={() => redirectToSymbolPage(symbol)}>
-                            {symbol}
+                            {symbol} - {name}
                         </ListGroup.Item>
                     )
                 })}   
@@ -61,9 +62,7 @@ const SymbolSearch = (props) => {
 
     return (
         <Aux>
-            <h1>Stock Search</h1>
-
-            <InputGroup className="mb-3">
+            <InputGroup className="mt-3">
                 <FormControl
                 placeholder="Search Symbol"
                 aria-label="symbol"

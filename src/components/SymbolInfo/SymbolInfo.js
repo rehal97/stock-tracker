@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
-import { getStock, symbolInfo } from '../../alpha-stocks';
+import { getStock, getDailyData, symbolInfo } from '../../alpha-stocks';
 import Aux from '../../hoc/Aux/Aux';
 
 const QuoteMap = {
@@ -24,10 +24,19 @@ const mapQuoteData = (data) => {
     return quoteData;
 }
 
+const dailyClosingPrice = (data) => {
+    let dailyData = {};
+    for (let date in data) {
+        dailyData[date] = parseFloat(data[date].['4. close']);
+    }
+    return dailyData;
+}
+
 const SymbolInfo = (props) => {
 
     const [symbol, setSymbol] = useState({});
     const [quoteData, setQuoteData] = useState({});
+    const [graphData, setGraphData] = useState({});
 
     useEffect(() => {
         symbolInfo(props.location.symbol).then(res => {
@@ -38,6 +47,12 @@ const SymbolInfo = (props) => {
             const data = mapQuoteData(res);
             setQuoteData(data);
         })
+
+        getDailyData(props.location.symbol).then(res => {
+            const dailyData = dailyClosingPrice(res);
+            console.log(dailyData);
+            setGraphData(dailyData);
+        })
     }, [])
 
     const renderSymbolInfo = useMemo(() => {
@@ -45,15 +60,15 @@ const SymbolInfo = (props) => {
             return (
                 <Aux>
                     <h2>{symbol.Name} ({symbol.Symbol})</h2>
-                    <h4>{parseFloat(quoteData.price)} {parseFloat(quoteData.change)} ({parseFloat(quoteData.changePercentage)}%)</h4>
+                    <h4>{parseFloat(quoteData.price)} {parseFloat(quoteData.change).toFixed(2)} ({parseFloat(quoteData.changePercentage).toFixed(2)}%)</h4>
 
-                    <p>Summary:</p>
+                    <h5>Summary:</h5>
                     <p>Previous Close: {parseFloat(quoteData.prevClose).toFixed(2)}</p>
                     <p>Open: {parseFloat(quoteData.open).toFixed(2)}</p>
                     <p>Days Range: {parseFloat(quoteData.low)}-{parseFloat(quoteData.high)}</p>
                     <p>Volume: {parseFloat(quoteData.volume)}</p>
 
-                    <p>Description:</p>
+                    <h5>Description:</h5>
                     <p>{symbol.Description}</p>
                 </Aux>
             )
