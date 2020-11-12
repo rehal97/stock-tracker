@@ -1,6 +1,7 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import Chart from 'chart.js';
 
-import { getStock, getDailyData, symbolInfo } from '../../alpha-stocks';
+import { getStock, getDailyData, getIntradayData, symbolInfo } from '../../alpha-stocks';
 import Aux from '../../hoc/Aux/Aux';
 
 const QuoteMap = {
@@ -24,7 +25,7 @@ const mapQuoteData = (data) => {
     return quoteData;
 }
 
-const dailyClosingPrice = (data) => {
+const getClosingPrice = (data) => {
     let dailyData = {};
     for (let date in data) {
         dailyData[date] = parseFloat(data[date].['4. close']);
@@ -33,10 +34,13 @@ const dailyClosingPrice = (data) => {
 }
 
 const SymbolInfo = (props) => {
+    const chartRef = useRef();
 
     const [symbol, setSymbol] = useState({});
     const [quoteData, setQuoteData] = useState({});
+    const [symbolPriceData, setSymbolPriceData] = useState({});
     const [graphData, setGraphData] = useState({});
+
 
     useEffect(() => {
         symbolInfo(props.location.symbol).then(res => {
@@ -49,11 +53,117 @@ const SymbolInfo = (props) => {
         })
 
         getDailyData(props.location.symbol).then(res => {
-            const dailyData = dailyClosingPrice(res);
-            console.log(dailyData);
-            setGraphData(dailyData);
+            const dailyData = getClosingPrice(res);
+            setSymbolPriceData(dailyData);
+            console.log(dailyData)
         })
+
+        // getIntradayData(props.location.symbol).then(res => {
+        //     const intradayData = getClosingPrice(res);
+        //     setSymbolPriceData(intradayData)
+        //     console.log(intradayData)
+            
+        // })
+
     }, [])
+
+    useEffect(() => {
+        if (chartRef.current) {
+            const myChartRef = chartRef.current.getContext("2d");
+
+            let labels = []
+            let prices = []
+
+            for(let key in graphData) {
+                labels.push(key);
+                prices.push(graphData[key]);
+            }
+            
+            labels = labels.reverse()
+            prices = prices.reverse()
+
+
+            new Chart(myChartRef, {
+                type: 'line',
+                data: {
+                  labels: labels,
+                  datasets: [{ 
+                      data: prices,
+                  }]
+                },
+                options: {
+                  elements: {
+                    // point:{
+                    //     radius: 0
+                    // },
+                    line: {
+                        tension: 0
+                    }
+                  },
+                  title: {
+                    display: true,
+                    text: 'Prices over the last 5 days'
+                  },
+                  legend: {
+                    display: false
+                 },
+                 scales:{
+                    xAxes: [{
+                        display: true,
+                        ticks: {
+                            maxTicksLimit: 5
+                        },
+                        type: 'time',
+                        time: {
+                            unit: 'day'
+                        }
+                    }]
+                }
+                }
+              });            
+        }
+
+    }, [graphData])
+
+    useEffect(() => {
+        getLastFiveDays(symbolPriceData);
+    }, [symbolPriceData])
+
+    const getLastFiveDays = (data) => {
+        const fiveDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+        let lastFiveDays = {};
+
+        let limit = 0;
+        for (let key in data) {   
+            console.log(key.toString());    
+            let date = new Date(key.toString()+'T00:00:00');
+            console.log(date.toString());
+            lastFiveDays[date] = data[key];
+            limit++;
+            if(limit > 4){
+                break;
+            }
+        }
+        setGraphData(lastFiveDays)
+        console.log(lastFiveDays)
+    }
+    
+    const getLastMonth = (data) => {
+        let limit = 0;
+        let lastMonth = [];
+
+        const limitDate = new Date();
+        limitDate.setDate(limitDate.getDate() - 30);
+
+        for (let key in data) {    
+            lastMonth[key] = data[key];
+            limit++;
+            if(key > limit){
+                break;
+            }
+        }
+        setGraphData(lastMonth);
+    }
 
     const renderSymbolInfo = useMemo(() => {
         if(symbol.Name){
@@ -68,17 +178,23 @@ const SymbolInfo = (props) => {
                     <p>Days Range: {parseFloat(quoteData.low)}-{parseFloat(quoteData.high)}</p>
                     <p>Volume: {parseFloat(quoteData.volume)}</p>
 
+                    <h5>Chart</h5>
+                    <canvas id="myChart" ref={chartRef} width="400" height="400"></canvas>
+                    
                     <h5>Description:</h5>
                     <p>{symbol.Description}</p>
                 </Aux>
             )
         } 
+        
         return null
     },[symbol, quoteData]);
 
     return (
         <Aux>
             {renderSymbolInfo}
+            
+
         </Aux>
     )
 }
