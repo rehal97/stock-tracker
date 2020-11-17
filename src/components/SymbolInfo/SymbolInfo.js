@@ -52,18 +52,10 @@ const SymbolInfo = (props) => {
             setQuoteData(data);
         })
 
-        getDailyData(props.location.symbol).then(res => {
-            const dailyData = getClosingPrice(res);
-            setSymbolPriceData(dailyData);
-            console.log(dailyData)
+        getIntradayData(props.location.symbol).then(res => {
+            const intradayData = getClosingPrice(res);
+            setSymbolPriceData(intradayData)
         })
-
-        // getIntradayData(props.location.symbol).then(res => {
-        //     const intradayData = getClosingPrice(res);
-        //     setSymbolPriceData(intradayData)
-        //     console.log(intradayData)
-            
-        // })
 
     }, [])
 
@@ -74,34 +66,61 @@ const SymbolInfo = (props) => {
             let labels = []
             let prices = []
 
-            for(let key in graphData) {
+            for(let key in graphData.data) {
                 labels.push(key);
-                prices.push(graphData[key]);
+                prices.push(graphData.data[key]);
             }
             
+            let timeframe;
+            let unit;
+            if(graphData.timeframe === 'intraday') {
+                timeframe = 6;
+                unit = 'hour'
+            } else if(graphData.timeframe === 'daily') {
+                timeframe = 4;
+                unit = 'day';
+            } else if (graphData.timeframe === 'monthly') {
+                timeframe = 14;
+                unit = 'month';
+            } else if (graphData.timeframe === 'sixmonths') {
+                timeframe = 6;
+                unit = 'month';
+            } else if (graphData.timeframe === 'yeartoday') {
+                timeframe = 12;
+                unit = 'month';
+            }
+
             labels = labels.reverse()
             prices = prices.reverse()
-
 
             new Chart(myChartRef, {
                 type: 'line',
                 data: {
                   labels: labels,
-                  datasets: [{ 
+                  datasets: [
+                    { 
                       data: prices,
-                  }]
+                      fill: false,
+                      borderColor: () => {
+                          if(prices[0] > prices[prices.length-1]) return 'red';
+                          return 'green'
+                      },
+                      borderWidth: 1,
+                    }
+                  ]
                 },
-                options: {
+                options: {    
+                  responsive: true,
                   elements: {
-                    // point:{
-                    //     radius: 0
-                    // },
+                    point:{
+                        radius: 0
+                    },
                     line: {
                         tension: 0
                     }
                   },
                   title: {
-                    display: true,
+                    display: false,
                     text: 'Prices over the last 5 days'
                   },
                   legend: {
@@ -111,58 +130,169 @@ const SymbolInfo = (props) => {
                     xAxes: [{
                         display: true,
                         ticks: {
-                            maxTicksLimit: 5
+                            maxTicksLimit: timeframe
                         },
                         type: 'time',
                         time: {
-                            unit: 'day'
+                            unit: unit
+                        }
+                    }],
+                    yAxes: [{
+                        display: false,
+                        ticks: {
+                            suggestedMin: Math.floor(Math.min(...prices)),
+                            suggestedMax: Math.ceil(Math.max(...prices))
                         }
                     }]
+                },
+                tooltips: { 
+                    callbacks: {
+                        label: (tooltipItem) => {
+                            return "$ " + tooltipItem.yLabel.toFixed(2);
+                        },
+                        title: (tooltipItem) => {
+                            let titleDate = new Date(tooltipItem[0].label);
+
+                            let month = titleDate.getMonth()+1;
+                            let date = titleDate.getDate();
+                            let hour = titleDate.getHours();
+                            let minute = titleDate.getMinutes();
+
+                            const titleString = month + '-' + date + ' ' + hour + ':' + (minute<10?'0':'') + minute;
+                            return titleString;
+                        }
+                    }
                 }
-                }
-              });            
+            }
+            });            
         }
+
 
     }, [graphData])
 
     useEffect(() => {
-        getLastFiveDays(symbolPriceData);
+        getLastDay(symbolPriceData);
     }, [symbolPriceData])
 
-    const getLastFiveDays = (data) => {
-        const fiveDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
-        let lastFiveDays = {};
+    const getLastDay = (data) => {
+        let lastDay = {};
 
-        let limit = 0;
-        for (let key in data) {   
-            console.log(key.toString());    
-            let date = new Date(key.toString()+'T00:00:00');
-            console.log(date.toString());
-            lastFiveDays[date] = data[key];
-            limit++;
-            if(limit > 4){
+        let limit = new Date();
+        limit.setHours(0,0,0)
+        limit.setTime(limit.getTime() - (1*24*60*60*1000));
+
+        for (let key in data) {
+            let date = new Date(key.toString());
+            if(date < limit){
                 break;
             }
+
+            // ignore after-market and pre-market data
+            if(date.getHours() >= 6 && date.getHours() < 16){
+                lastDay[date] = data[key];
+            }            
         }
-        setGraphData(lastFiveDays)
-        console.log(lastFiveDays)
+
+        setGraphData({
+            timeframe: 'intraday',
+            data: lastDay
+        });
+    }
+
+    const getLastFiveDays = (data) => {
+        let lastFiveDays = {};
+
+        let limit = new Date();
+        limit.setHours(0,0,0)
+        limit.setTime(limit.getTime() - (7*24*60*60*1000));
+
+        for (let key in data) {
+            let date = new Date(key.toString());
+            if(date < limit){
+                break;
+            }
+
+            // ignore after-market and pre-market data
+            if(date.getHours() >= 6 && date.getHours() < 16){
+                lastFiveDays[date] = data[key];
+            }            
+        }
+
+        setGraphData({
+            timeframe: 'daily',
+            data: lastFiveDays
+        });
     }
     
     const getLastMonth = (data) => {
-        let limit = 0;
         let lastMonth = [];
 
-        const limitDate = new Date();
-        limitDate.setDate(limitDate.getDate() - 30);
+        let limit = new Date();
+        limit.setHours(0,0,0)
+        limit.setTime(limit.getTime() - (31*24*60*60*1000));
 
         for (let key in data) {    
             lastMonth[key] = data[key];
-            limit++;
-            if(key > limit){
+            if(key >= limit){
                 break;
             }
         }
-        setGraphData(lastMonth);
+        setGraphData({
+            timeframe: 'monthly',
+            data: lastMonth
+        });
+
+        console.log(lastMonth)
+    }
+
+    const getLastSixMonths = async () => {
+
+        let dailyData = await getDailyData(props.location.symbol);
+        dailyData = getClosingPrice(dailyData);
+
+        let lastSixMonths = [];
+
+        let limit = new Date();
+        limit.setHours(0,0,0)
+        limit.setTime(limit.getTime() - (178*24*60*60*1000));
+
+        for (let key in dailyData) {    
+            lastSixMonths[key] = dailyData[key];
+            if(key >= limit){
+                break;
+            }
+        }
+        setGraphData({
+            timeframe: 'sixmonths',
+            data: lastSixMonths
+        });
+
+        console.log(lastSixMonths)
+
+    }
+
+    const getYearToDay = async () => {
+
+        let dailyData = await getDailyData(props.location.symbol);
+        dailyData = getClosingPrice(dailyData);
+
+        let yearToDay = [];
+
+        let limit = new Date();
+        limit.setHours(0,0,0)
+        limit.setTime(limit.getTime() - (365*24*60*60*1000));
+        console.log(limit)
+        for (let key in dailyData) {    
+            yearToDay[key] = dailyData[key];
+            if(key < limit){
+                break;
+            }
+        }
+        setGraphData({
+            timeframe: 'yeartoday',
+            data: yearToDay
+        });
+        console.log(yearToDay)
     }
 
     const renderSymbolInfo = useMemo(() => {

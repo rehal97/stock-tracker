@@ -30,7 +30,7 @@ export const getIntradayData = async (symbol) => {
     const apikey = process.env.REACT_APP_ALPHA_KEY;
     const queryParams = '?function=' + func + '&symbol=' + symbol + '&interval=' + interval + '&outputsize=' + outputsize + '&apikey=' + apikey;
 
-    const res = await instance.get(queryParams)
+    const res = await instance.get(queryParams);
     return res.data['Time Series (5min)'];
 }
 
