@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Chart from 'chart.js';
 
 import { getStock, getDailyData, getIntradayData, symbolInfo } from '../../alpha-stocks';
@@ -69,7 +69,7 @@ const SymbolInfo = (props) => {
             setSymbolPriceData(intradayData)
         })
 
-    }, [])
+    }, [props.location.symbol])
 
     useEffect(() => {
         if (chartRef.current) {
@@ -250,14 +250,14 @@ const SymbolInfo = (props) => {
                 break;
             }
         }
-        
+
         setGraphData({
             timeframe: 'monthly',
             data: lastMonth
         });
     }
 
-    const getLastSixMonths = async () => {
+    const getLastSixMonths = useCallback(async () => {
 
         let dailyData = await getDailyData(props.location.symbol);
         dailyData = getClosingPrice(dailyData);
@@ -278,12 +278,9 @@ const SymbolInfo = (props) => {
             timeframe: 'sixmonths',
             data: lastSixMonths
         });
+    }, [props.location.symbol]);
 
-        console.log(lastSixMonths)
-
-    }
-
-    const getYearToDay = async () => {
+    const getYearToDay = useCallback(async () => {
 
         let dailyData = await getDailyData(props.location.symbol);
         dailyData = getClosingPrice(dailyData);
@@ -293,7 +290,7 @@ const SymbolInfo = (props) => {
         let limit = new Date();
         limit.setHours(0,0,0)
         limit.setTime(limit.getTime() - (365*24*60*60*1000));
-        console.log(limit)
+        
         for (let key in dailyData) {    
             yearToDay[key] = dailyData[key];
             if(key < limit){
@@ -304,10 +301,9 @@ const SymbolInfo = (props) => {
             timeframe: 'yeartoday',
             data: yearToDay
         });
-        console.log(yearToDay)
-    }
+    }, [props.location.symbol]);
 
-    const updateChart = (range) => {  
+    const updateChart = useCallback(range => {  
         switch (range){
             case 'oneDay':
                 setSelectedRange({
@@ -361,7 +357,7 @@ const SymbolInfo = (props) => {
                 break;
             default: return
         }
-    }
+    }, [getLastSixMonths, getYearToDay, symbolPriceData]);
 
     const renderSymbolInfo = useMemo(() => {
         if(symbol.Name){
@@ -407,7 +403,7 @@ const SymbolInfo = (props) => {
         } 
         
         return null
-    },[symbol, quoteData, selectedRange]);
+    },[symbol, quoteData, selectedRange, updateChart]);
 
     return (
         <Aux>

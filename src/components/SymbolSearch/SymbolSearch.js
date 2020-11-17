@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 // import { Redirect } from 'react-router-dom';
 
 import InputGroup from 'react-bootstrap/InputGroup';
@@ -21,7 +21,6 @@ const SymbolSearch = (props) => {
                 symbolSearch(inputSymbol).then( res => {
                     if (res && !res['Error Message']) {
                         setSearchResults(res);
-                        // console.log(res)
                     }
                 })
             }
@@ -31,13 +30,12 @@ const SymbolSearch = (props) => {
         }
     }, [inputSymbol, inputRef]);
 
-    const redirectToSymbolPage = (symbol) => {
-        // console.log('path: ' + '/symbol/' + symbol);
+    const redirectToSymbolPage = useCallback( symbol => {
         props.history.push({
             pathname: '/symbol/' + symbol,
             symbol: symbol
         });
-    }
+    }, [props.history])
 
     const renderSearchResults = useMemo (() => {
         const bestMatches = searchResults.['bestMatches'];
@@ -58,7 +56,7 @@ const SymbolSearch = (props) => {
         } else {
             return null
         }
-    }, [searchResults]);
+    }, [searchResults, redirectToSymbolPage]);
 
     return (
         <Aux>
