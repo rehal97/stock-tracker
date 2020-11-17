@@ -4,6 +4,10 @@ import Chart from 'chart.js';
 import { getStock, getDailyData, getIntradayData, symbolInfo } from '../../alpha-stocks';
 import Aux from '../../hoc/Aux/Aux';
 
+import Button from 'react-bootstrap/Button';
+import ButtonGroup from 'react-bootstrap/ButtonGroup';
+
+
 const QuoteMap = {
     "01. symbol": "symbol",
     "02. open": "open",
@@ -40,6 +44,14 @@ const SymbolInfo = (props) => {
     const [quoteData, setQuoteData] = useState({});
     const [symbolPriceData, setSymbolPriceData] = useState({});
     const [graphData, setGraphData] = useState({});
+    const [selectedRange, setSelectedRange] = useState({
+        oneDay: true,
+        fiveDays: false,
+        oneMonth: false,
+        sixMonths: false,
+        yearToDay: false
+    });
+
 
 
     useEffect(() => {
@@ -125,7 +137,7 @@ const SymbolInfo = (props) => {
                   },
                   legend: {
                     display: false
-                 },
+                  },
                  scales:{
                     xAxes: [{
                         display: true,
@@ -135,7 +147,8 @@ const SymbolInfo = (props) => {
                         type: 'time',
                         time: {
                             unit: unit
-                        }
+                        },
+                        distribution: 'series'
                     }],
                     yAxes: [{
                         display: false,
@@ -237,12 +250,11 @@ const SymbolInfo = (props) => {
                 break;
             }
         }
+        
         setGraphData({
             timeframe: 'monthly',
             data: lastMonth
         });
-
-        console.log(lastMonth)
     }
 
     const getLastSixMonths = async () => {
@@ -295,6 +307,62 @@ const SymbolInfo = (props) => {
         console.log(yearToDay)
     }
 
+    const updateChart = (range) => {  
+        switch (range){
+            case 'oneDay':
+                setSelectedRange({
+                    oneDay: true,
+                    fiveDays: false,
+                    oneMonth: false,
+                    sixMonths: false,
+                    yearToDay: false
+                });
+                getLastDay(symbolPriceData);
+                break;
+            case 'fiveDays':
+                setSelectedRange({
+                    oneDay: false,
+                    fiveDays: true,
+                    oneMonth: false,
+                    sixMonths: false,
+                    yearToDay: false
+                });
+                getLastFiveDays(symbolPriceData);
+                break;
+            case 'oneMonth':
+                setSelectedRange({
+                    oneDay: false,
+                    fiveDays: false,
+                    oneMonth: true,
+                    sixMonths: false,
+                    yearToDay: false
+                });
+                getLastMonth(symbolPriceData);
+                break;
+            case 'sixMonths':
+                setSelectedRange({
+                    oneDay: false,
+                    fiveDays: false,
+                    oneMonth: false,
+                    sixMonths: true,
+                    yearToDay: false
+                });
+                getLastSixMonths();
+                break;
+            case 'yearToDay':
+                setSelectedRange({
+                    oneDay: false,
+                    fiveDays: false,
+                    oneMonth: false,
+                    sixMonths: false,
+                    yearToDay: true
+                });
+                getYearToDay();
+                break;
+            default: return
+        }
+    }
+
     const renderSymbolInfo = useMemo(() => {
         if(symbol.Name){
             return (
@@ -308,8 +376,29 @@ const SymbolInfo = (props) => {
                     <p>Days Range: {parseFloat(quoteData.low)}-{parseFloat(quoteData.high)}</p>
                     <p>Volume: {parseFloat(quoteData.volume)}</p>
 
-                    <h5>Chart</h5>
-                    <canvas id="myChart" ref={chartRef} width="400" height="400"></canvas>
+                    <canvas id="myChart" ref={chartRef} width="400" height="300"></canvas>
+                    <ButtonGroup aria-label="Basic example">
+                        <Button 
+                            className={selectedRange.oneDay ? 'active' : null} 
+                            variant="secondary" 
+                            onClick={updateChart.bind(this, 'oneDay')}>1D</Button>
+                        <Button 
+                            className={selectedRange.fiveDays ? 'active' : null} 
+                            variant="secondary"
+                            onClick={updateChart.bind(this, 'fiveDays')}>5D</Button>
+                        <Button 
+                            className={selectedRange.oneMonth ? 'active' : null} 
+                            variant="secondary"
+                            onClick={updateChart.bind(this, 'oneMonth')}>1M</Button>
+                        <Button 
+                            className={selectedRange.sixMonths ? 'active' : null} 
+                            variant="secondary"
+                            onClick={updateChart.bind(this, 'sixMonths')}>6M</Button>
+                        <Button 
+                            className={selectedRange.yearToDay ? 'active' : null} 
+                            variant="secondary"
+                            onClick={updateChart.bind(this, 'yearToDay')}>YTD</Button>
+                    </ButtonGroup>
                     
                     <h5>Description:</h5>
                     <p>{symbol.Description}</p>
@@ -318,13 +407,11 @@ const SymbolInfo = (props) => {
         } 
         
         return null
-    },[symbol, quoteData]);
+    },[symbol, quoteData, selectedRange]);
 
     return (
         <Aux>
             {renderSymbolInfo}
-            
-
         </Aux>
     )
 }
