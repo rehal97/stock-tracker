@@ -3,7 +3,7 @@ import Form from "react-bootstrap/Form";
 import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 
-import "./NavigationBar.css";
+import classes from "./NavigationBar.module.css";
 
 import AuthenticationButton from "../../components/Auth/AuthenticationButton";
 
@@ -13,7 +13,7 @@ const NavigationBar = () => (
     <Navbar.Toggle aria-controls="basic-navbar-nav" />
 
     <Navbar.Collapse id="basic-navbar-nav">
-      <Nav className={"NavbarItems"}>
+      <Nav className={classes.NavbarItems}>
         <Nav.Link href="/markets">Markets</Nav.Link>
         <Nav.Link href="/crypto">Crypto</Nav.Link>
         <Nav.Link href="/watchlist">Watchlist</Nav.Link>
