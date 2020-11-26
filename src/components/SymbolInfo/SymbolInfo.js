@@ -15,8 +15,13 @@ import {
 } from "../../alpha-stocks";
 import Aux from "../../hoc/Aux/Aux";
 
+import classes from "./SymbolInfo.module.css";
+
 import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
+import Container from "react-bootstrap/Container";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
 
 const QuoteMap = {
   "01. symbol": "symbol",
@@ -382,64 +387,86 @@ const SymbolInfo = (props) => {
     if (symbol.Name) {
       return (
         <Aux>
-          <h2>
-            {symbol.Name} ({symbol.Symbol})
-          </h2>
-          <h4>
-            {parseFloat(quoteData.price)}{" "}
-            {parseFloat(quoteData.change).toFixed(2)} (
-            {parseFloat(quoteData.changePercentage).toFixed(2)}%)
-          </h4>
+          <Container>
+            <Row>
+              <Col>
+                <h2>
+                  {symbol.Name} ({symbol.Symbol})
+                </h2>
+                <h4>
+                  {parseFloat(quoteData.price)}{" "}
+                  {parseFloat(quoteData.change).toFixed(2)} (
+                  {parseFloat(quoteData.changePercentage).toFixed(2)}%)
+                </h4>
+              </Col>
+            </Row>
+            <Row className="mt-3">
+              <Col>
+                <h5>Summary:</h5>
+                <p>
+                  Previous Close: {parseFloat(quoteData.prevClose).toFixed(2)}
+                </p>
+                <p>Open: {parseFloat(quoteData.open).toFixed(2)}</p>
+                <p>
+                  Days Range: {parseFloat(quoteData.low)}-
+                  {parseFloat(quoteData.high)}
+                </p>
+                <p>Volume: {parseFloat(quoteData.volume)}</p>
+              </Col>
 
-          <h5>Summary:</h5>
-          <p>Previous Close: {parseFloat(quoteData.prevClose).toFixed(2)}</p>
-          <p>Open: {parseFloat(quoteData.open).toFixed(2)}</p>
-          <p>
-            Days Range: {parseFloat(quoteData.low)}-{parseFloat(quoteData.high)}
-          </p>
-          <p>Volume: {parseFloat(quoteData.volume)}</p>
-
-          <canvas id="myChart" ref={chartRef} width="400" height="300"></canvas>
-          <ButtonGroup aria-label="Basic example">
-            <Button
-              className={selectedRange.oneDay ? "active" : null}
-              variant="secondary"
-              onClick={updateChart.bind(this, "oneDay")}
-            >
-              1D
-            </Button>
-            <Button
-              className={selectedRange.fiveDays ? "active" : null}
-              variant="secondary"
-              onClick={updateChart.bind(this, "fiveDays")}
-            >
-              5D
-            </Button>
-            <Button
-              className={selectedRange.oneMonth ? "active" : null}
-              variant="secondary"
-              onClick={updateChart.bind(this, "oneMonth")}
-            >
-              1M
-            </Button>
-            <Button
-              className={selectedRange.sixMonths ? "active" : null}
-              variant="secondary"
-              onClick={updateChart.bind(this, "sixMonths")}
-            >
-              6M
-            </Button>
-            <Button
-              className={selectedRange.yearToDay ? "active" : null}
-              variant="secondary"
-              onClick={updateChart.bind(this, "yearToDay")}
-            >
-              YTD
-            </Button>
-          </ButtonGroup>
-
-          <h5>Description:</h5>
-          <p>{symbol.Description}</p>
+              <Col>
+                <canvas
+                  id="myChart"
+                  ref={chartRef}
+                  width="400"
+                  height="300"
+                ></canvas>
+                <ButtonGroup className={classes.RangeButtons}>
+                  <Button
+                    className={selectedRange.oneDay ? "active" : null}
+                    variant="secondary"
+                    onClick={updateChart.bind(this, "oneDay")}
+                  >
+                    1D
+                  </Button>
+                  <Button
+                    className={selectedRange.fiveDays ? "active" : null}
+                    variant="secondary"
+                    onClick={updateChart.bind(this, "fiveDays")}
+                  >
+                    5D
+                  </Button>
+                  <Button
+                    className={selectedRange.oneMonth ? "active" : null}
+                    variant="secondary"
+                    onClick={updateChart.bind(this, "oneMonth")}
+                  >
+                    1M
+                  </Button>
+                  <Button
+                    className={selectedRange.sixMonths ? "active" : null}
+                    variant="secondary"
+                    onClick={updateChart.bind(this, "sixMonths")}
+                  >
+                    6M
+                  </Button>
+                  <Button
+                    className={selectedRange.yearToDay ? "active" : null}
+                    variant="secondary"
+                    onClick={updateChart.bind(this, "yearToDay")}
+                  >
+                    YTD
+                  </Button>
+                </ButtonGroup>
+              </Col>
+            </Row>
+            <Row className="mt-3">
+              <Col>
+                <h5>Description:</h5>
+                <p>{symbol.Description}</p>
+              </Col>
+            </Row>
+          </Container>
         </Aux>
       );
     }
