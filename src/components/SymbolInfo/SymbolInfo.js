@@ -36,6 +36,14 @@ const QuoteMap = {
   "10. change percent": "changePercentage",
 };
 
+const initialRangeState = {
+  oneDay: { active: false, label: "1D" },
+  fiveDays: { active: false, label: "5D" },
+  oneMonth: { active: false, label: "1M" },
+  sixMonths: { active: false, label: "6M" },
+  yearToDay: { active: false, label: "YTD" },
+};
+
 const mapQuoteData = (data) => {
   let quoteData = {};
   for (let key in QuoteMap) {
@@ -60,11 +68,8 @@ const SymbolInfo = (props) => {
   const [symbolPriceData, setSymbolPriceData] = useState({});
   const [graphData, setGraphData] = useState({});
   const [selectedRange, setSelectedRange] = useState({
-    oneDay: true,
-    fiveDays: false,
-    oneMonth: false,
-    sixMonths: false,
-    yearToDay: false,
+    ...initialRangeState,
+    oneDay: { active: true, label: "1D" },
   });
 
   useEffect(() => {
@@ -323,64 +328,44 @@ const SymbolInfo = (props) => {
     });
   }, [props.location.symbol]);
 
+  const toggleRangeSelectors = useCallback(
+    (selected) => {
+      let newRange = {
+        ...initialRangeState,
+        [selected]: {
+          ...selectedRange[selected],
+          active: true,
+        },
+      };
+      setSelectedRange(newRange);
+    },
+    [selectedRange]
+  );
+
   const updateChart = useCallback(
     (range) => {
+      toggleRangeSelectors(range);
       switch (range) {
         case "oneDay":
-          setSelectedRange({
-            oneDay: true,
-            fiveDays: false,
-            oneMonth: false,
-            sixMonths: false,
-            yearToDay: false,
-          });
           getLastDay(symbolPriceData);
           break;
         case "fiveDays":
-          setSelectedRange({
-            oneDay: false,
-            fiveDays: true,
-            oneMonth: false,
-            sixMonths: false,
-            yearToDay: false,
-          });
           getLastFiveDays(symbolPriceData);
           break;
         case "oneMonth":
-          setSelectedRange({
-            oneDay: false,
-            fiveDays: false,
-            oneMonth: true,
-            sixMonths: false,
-            yearToDay: false,
-          });
           getLastMonth(symbolPriceData);
           break;
         case "sixMonths":
-          setSelectedRange({
-            oneDay: false,
-            fiveDays: false,
-            oneMonth: false,
-            sixMonths: true,
-            yearToDay: false,
-          });
           getLastSixMonths();
           break;
         case "yearToDay":
-          setSelectedRange({
-            oneDay: false,
-            fiveDays: false,
-            oneMonth: false,
-            sixMonths: false,
-            yearToDay: true,
-          });
           getYearToDay();
           break;
         default:
           return;
       }
     },
-    [getLastSixMonths, getYearToDay, symbolPriceData]
+    [getLastSixMonths, getYearToDay, symbolPriceData, toggleRangeSelectors]
   );
 
   const renderRangeSelectors = useMemo(() => {
