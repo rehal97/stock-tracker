@@ -383,6 +383,25 @@ const SymbolInfo = (props) => {
     [getLastSixMonths, getYearToDay, symbolPriceData]
   );
 
+  const renderRangeSelectors = useMemo(() => {
+    return (
+      <ButtonGroup className={classes.RangeButtons}>
+        {Object.keys(selectedRange).map((key, index) => {
+          return (
+            <Button
+              className={selectedRange[key].active ? "active" : null}
+              variant="secondary"
+              onClick={updateChart.bind(this, key)}
+              key={key}
+            >
+              {selectedRange[key].label}
+            </Button>
+          );
+        })}
+      </ButtonGroup>
+    );
+  }, [selectedRange, updateChart]);
+
   const getChangeStyle = (number) => {
     if (parseFloat(number) > 0) {
       return classes.PositiveChange;
@@ -438,43 +457,7 @@ const SymbolInfo = (props) => {
                   width="400"
                   height="300"
                 ></canvas>
-                <ButtonGroup className={classes.RangeButtons}>
-                  <Button
-                    className={selectedRange.oneDay ? "active" : null}
-                    variant="secondary"
-                    onClick={updateChart.bind(this, "oneDay")}
-                  >
-                    1D
-                  </Button>
-                  <Button
-                    className={selectedRange.fiveDays ? "active" : null}
-                    variant="secondary"
-                    onClick={updateChart.bind(this, "fiveDays")}
-                  >
-                    5D
-                  </Button>
-                  <Button
-                    className={selectedRange.oneMonth ? "active" : null}
-                    variant="secondary"
-                    onClick={updateChart.bind(this, "oneMonth")}
-                  >
-                    1M
-                  </Button>
-                  <Button
-                    className={selectedRange.sixMonths ? "active" : null}
-                    variant="secondary"
-                    onClick={updateChart.bind(this, "sixMonths")}
-                  >
-                    6M
-                  </Button>
-                  <Button
-                    className={selectedRange.yearToDay ? "active" : null}
-                    variant="secondary"
-                    onClick={updateChart.bind(this, "yearToDay")}
-                  >
-                    YTD
-                  </Button>
-                </ButtonGroup>
+                {renderRangeSelectors}
               </Col>
             </Row>
             <Row className="mt-3">
@@ -489,7 +472,7 @@ const SymbolInfo = (props) => {
     }
 
     return null;
-  }, [symbol, quoteData, selectedRange, updateChart]);
+  }, [symbol, quoteData, renderRangeSelectors]);
 
   return <Aux>{renderSymbolInfo}</Aux>;
 };
