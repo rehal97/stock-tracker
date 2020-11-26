@@ -383,6 +383,15 @@ const SymbolInfo = (props) => {
     [getLastSixMonths, getYearToDay, symbolPriceData]
   );
 
+  const getChangeStyle = (number) => {
+    if (parseFloat(number) > 0) {
+      return classes.PositiveChange;
+    } else if (parseFloat(number) < 0) {
+      return classes.NegativeChange;
+    }
+    return null;
+  };
+
   const renderSymbolInfo = useMemo(() => {
     if (symbol.Name) {
       return (
@@ -393,11 +402,19 @@ const SymbolInfo = (props) => {
                 <h2>
                   {symbol.Name} ({symbol.Symbol})
                 </h2>
-                <h4>
-                  {parseFloat(quoteData.price)}{" "}
-                  {parseFloat(quoteData.change).toFixed(2)} (
-                  {parseFloat(quoteData.changePercentage).toFixed(2)}%)
-                </h4>
+                <div>
+                  <h4>
+                    {parseFloat(quoteData.price).toFixed(2)}{" "}
+                    <span className={getChangeStyle(quoteData.change)}>
+                      {parseFloat(quoteData.change).toFixed(2)}{" "}
+                    </span>
+                    <span
+                      className={getChangeStyle(quoteData.changePercentage)}
+                    >
+                      ({parseFloat(quoteData.changePercentage).toFixed(2)}%)
+                    </span>
+                  </h4>
+                </div>
               </Col>
             </Row>
             <Row className="mt-3">
