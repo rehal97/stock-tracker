@@ -148,10 +148,6 @@ const SymbolInfo = (props) => {
               tension: 0,
             },
           },
-          title: {
-            display: false,
-            text: "Prices over the last 5 days",
-          },
           legend: {
             display: false,
           },
@@ -172,10 +168,6 @@ const SymbolInfo = (props) => {
             yAxes: [
               {
                 display: false,
-                ticks: {
-                  suggestedMin: Math.floor(Math.min(...prices)),
-                  suggestedMax: Math.ceil(Math.max(...prices)),
-                },
               },
             ],
           },
