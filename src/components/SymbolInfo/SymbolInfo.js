@@ -12,6 +12,7 @@ import { getStock, getIntradayData, symbolInfo } from "../../alpha-stocks";
 
 import {
   mapQuoteData,
+  getClosingPrice,
   getLastDay,
   getLastFiveDays,
   getLastMonth,
@@ -34,14 +35,6 @@ const initialRangeState = {
   oneMonth: { active: false, label: "1M" },
   sixMonths: { active: false, label: "6M" },
   yearToDay: { active: false, label: "YTD" },
-};
-
-const getClosingPrice = (data) => {
-  let dailyData = {};
-  for (let date in data) {
-    dailyData[date] = parseFloat(data[date]["4. close"]);
-  }
-  return dailyData;
 };
 
 const SymbolInfo = (props) => {

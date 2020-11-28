@@ -21,7 +21,7 @@ export const mapQuoteData = (data) => {
   return quoteData;
 };
 
-const getClosingPrice = (data) => {
+export const getClosingPrice = (data) => {
   let dailyData = {};
   for (let date in data) {
     dailyData[date] = parseFloat(data[date]["4. close"]);
@@ -106,8 +106,6 @@ export const getLastMonth = (data) => {
 };
 
 export const getLastSixMonths = async (symbol) => {
-  console.log("6 monthssss");
-
   let dailyData = await getDailyData(symbol);
   dailyData = getClosingPrice(dailyData);
 
