@@ -16,7 +16,7 @@ export const getStock = async (symbol) => {
 
 export const getDailyData = async (symbol) => {
   const func = "TIME_SERIES_DAILY_ADJUSTED";
-  const outputsize = "compact";
+  const outputsize = "full";
   const apikey = process.env.REACT_APP_ALPHA_KEY;
   const queryParams =
     "?function=" +

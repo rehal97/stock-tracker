@@ -5,16 +5,20 @@ import React, {
   useRef,
   useState,
 } from "react";
+
 import Chart from "chart.js";
 
-import {
-  getStock,
-  getDailyData,
-  getIntradayData,
-  symbolInfo,
-} from "../../alpha-stocks";
-import Aux from "../../hoc/Aux/Aux";
+import { getStock, getIntradayData, symbolInfo } from "../../alpha-stocks";
 
+import {
+  getLastDay,
+  getLastFiveDays,
+  getLastMonth,
+  getLastSixMonths,
+  getYearToDay,
+} from "../../utils/StockData/StockData";
+
+import Aux from "../../hoc/Aux/Aux";
 import classes from "./SymbolInfo.module.css";
 
 import Button from "react-bootstrap/Button";
@@ -63,6 +67,7 @@ const getClosingPrice = (data) => {
 const SymbolInfo = (props) => {
   const chartRef = useRef();
 
+  const [chart, setChart] = useState();
   const [symbol, setSymbol] = useState({});
   const [quoteData, setQuoteData] = useState({});
   const [symbolPriceData, setSymbolPriceData] = useState({});
@@ -91,6 +96,7 @@ const SymbolInfo = (props) => {
   useEffect(() => {
     if (chartRef.current) {
       const myChartRef = chartRef.current.getContext("2d");
+      let myChart;
 
       let labels = [];
       let prices = [];
@@ -122,7 +128,11 @@ const SymbolInfo = (props) => {
       labels = labels.reverse();
       prices = prices.reverse();
 
-      new Chart(myChartRef, {
+      if (chart) {
+        chart.destroy();
+      }
+
+      myChart = new Chart(myChartRef, {
         type: "line",
         data: {
           labels: labels,
@@ -199,126 +209,13 @@ const SymbolInfo = (props) => {
           },
         },
       });
+      setChart(myChart);
     }
   }, [graphData]);
 
   useEffect(() => {
-    getLastDay(symbolPriceData);
+    setGraphData(getLastDay(symbolPriceData));
   }, [symbolPriceData]);
-
-  const getLastDay = (data) => {
-    let lastDay = {};
-
-    let limit = new Date();
-    limit.setHours(0, 0, 0);
-    limit.setTime(limit.getTime() - 1 * 24 * 60 * 60 * 1000);
-
-    for (let key in data) {
-      let date = new Date(key.toString());
-      if (date < limit) {
-        break;
-      }
-
-      // ignore after-market and pre-market data
-      if (date.getHours() >= 6 && date.getHours() < 16) {
-        lastDay[date] = data[key];
-      }
-    }
-
-    setGraphData({
-      timeframe: "intraday",
-      data: lastDay,
-    });
-  };
-
-  const getLastFiveDays = (data) => {
-    let lastFiveDays = {};
-
-    let limit = new Date();
-    limit.setHours(0, 0, 0);
-    limit.setTime(limit.getTime() - 7 * 24 * 60 * 60 * 1000);
-
-    for (let key in data) {
-      let date = new Date(key.toString());
-      if (date < limit) {
-        break;
-      }
-
-      // ignore after-market and pre-market data
-      if (date.getHours() >= 6 && date.getHours() < 16) {
-        lastFiveDays[date] = data[key];
-      }
-    }
-
-    setGraphData({
-      timeframe: "daily",
-      data: lastFiveDays,
-    });
-  };
-
-  const getLastMonth = (data) => {
-    let lastMonth = [];
-
-    let limit = new Date();
-    limit.setHours(0, 0, 0);
-    limit.setTime(limit.getTime() - 31 * 24 * 60 * 60 * 1000);
-
-    for (let key in data) {
-      lastMonth[key] = data[key];
-      if (key >= limit) {
-        break;
-      }
-    }
-
-    setGraphData({
-      timeframe: "monthly",
-      data: lastMonth,
-    });
-  };
-
-  const getLastSixMonths = useCallback(async () => {
-    let dailyData = await getDailyData(props.location.symbol);
-    dailyData = getClosingPrice(dailyData);
-
-    let lastSixMonths = [];
-
-    let limit = new Date();
-    limit.setHours(0, 0, 0);
-    limit.setTime(limit.getTime() - 178 * 24 * 60 * 60 * 1000);
-
-    for (let key in dailyData) {
-      lastSixMonths[key] = dailyData[key];
-      if (key >= limit) {
-        break;
-      }
-    }
-    setGraphData({
-      timeframe: "sixmonths",
-      data: lastSixMonths,
-    });
-  }, [props.location.symbol]);
-
-  const getYearToDay = useCallback(async () => {
-    let dailyData = await getDailyData(props.location.symbol);
-    dailyData = getClosingPrice(dailyData);
-
-    let yearToDay = [];
-
-    let limit = new Date();
-    limit.setHours(0, 0, 0);
-    limit.setTime(limit.getTime() - 365 * 24 * 60 * 60 * 1000);
-
-    for (let key in dailyData) {
-      yearToDay[key] = dailyData[key];
-      if (key < limit) {
-        break;
-      }
-    }
-    setGraphData({
-      timeframe: "yeartoday",
-      data: yearToDay,
-    });
-  }, [props.location.symbol]);
 
   const toggleRangeSelectors = useCallback(
     (selected) => {
@@ -335,29 +232,29 @@ const SymbolInfo = (props) => {
   );
 
   const updateChart = useCallback(
-    (range) => {
+    async (range) => {
       toggleRangeSelectors(range);
       switch (range) {
         case "oneDay":
-          getLastDay(symbolPriceData);
+          setGraphData(getLastDay(symbolPriceData));
           break;
         case "fiveDays":
-          getLastFiveDays(symbolPriceData);
+          setGraphData(getLastFiveDays(symbolPriceData));
           break;
         case "oneMonth":
-          getLastMonth(symbolPriceData);
+          setGraphData(getLastMonth(symbolPriceData));
           break;
         case "sixMonths":
-          getLastSixMonths();
+          setGraphData(await getLastSixMonths(props.location.symbol));
           break;
         case "yearToDay":
-          getYearToDay();
+          setGraphData(await getYearToDay(props.location.symbol));
           break;
         default:
           return;
       }
     },
-    [getLastSixMonths, getYearToDay, symbolPriceData, toggleRangeSelectors]
+    [props.location.symbol, symbolPriceData, toggleRangeSelectors]
   );
 
   const renderRangeSelectors = useMemo(() => {
