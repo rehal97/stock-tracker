@@ -11,6 +11,7 @@ import Chart from "chart.js";
 import { getStock, getIntradayData, symbolInfo } from "../../alpha-stocks";
 
 import {
+  mapQuoteData,
   getLastDay,
   getLastFiveDays,
   getLastMonth,
@@ -27,33 +28,12 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 
-const QuoteMap = {
-  "01. symbol": "symbol",
-  "02. open": "open",
-  "03. high": "high",
-  "04. low": "low",
-  "05. price": "price",
-  "06. volume": "volume",
-  "07. latest trading day": "ltd",
-  "08. previous close": "prevClose",
-  "09. change": "change",
-  "10. change percent": "changePercentage",
-};
-
 const initialRangeState = {
   oneDay: { active: false, label: "1D" },
   fiveDays: { active: false, label: "5D" },
   oneMonth: { active: false, label: "1M" },
   sixMonths: { active: false, label: "6M" },
   yearToDay: { active: false, label: "YTD" },
-};
-
-const mapQuoteData = (data) => {
-  let quoteData = {};
-  for (let key in QuoteMap) {
-    quoteData[QuoteMap[key]] = data[key];
-  }
-  return quoteData;
 };
 
 const getClosingPrice = (data) => {

@@ -1,5 +1,26 @@
 import { getDailyData } from "../../alpha-stocks";
 
+const QuoteMap = {
+  "01. symbol": "symbol",
+  "02. open": "open",
+  "03. high": "high",
+  "04. low": "low",
+  "05. price": "price",
+  "06. volume": "volume",
+  "07. latest trading day": "ltd",
+  "08. previous close": "prevClose",
+  "09. change": "change",
+  "10. change percent": "changePercentage",
+};
+
+export const mapQuoteData = (data) => {
+  let quoteData = {};
+  for (let key in QuoteMap) {
+    quoteData[QuoteMap[key]] = data[key];
+  }
+  return quoteData;
+};
+
 const getClosingPrice = (data) => {
   let dailyData = {};
   for (let date in data) {
@@ -58,8 +79,6 @@ export const getLastFiveDays = (data) => {
     }
   }
 
-  console.log(lastFiveDays);
-
   return {
     timeframe: "daily",
     data: lastFiveDays,
@@ -87,6 +106,8 @@ export const getLastMonth = (data) => {
 };
 
 export const getLastSixMonths = async (symbol) => {
+  console.log("6 monthssss");
+
   let dailyData = await getDailyData(symbol);
   dailyData = getClosingPrice(dailyData);
 
@@ -102,6 +123,7 @@ export const getLastSixMonths = async (symbol) => {
       break;
     }
   }
+
   return {
     timeframe: "sixmonths",
     data: lastSixMonths,
