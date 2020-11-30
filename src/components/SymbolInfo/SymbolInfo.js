@@ -8,16 +8,13 @@ import React, {
 
 import Chart from "chart.js";
 
-import { getStock, getIntradayData, symbolInfo } from "../../alpha-stocks";
-
 import {
-  mapQuoteData,
-  getClosingPrice,
   getLastDay,
   getLastFiveDays,
   getLastMonth,
   getLastSixMonths,
   getYearToDay,
+  getInitialStockData,
 } from "../../utils/StockData/StockData";
 
 import Aux from "../../hoc/Aux/Aux";
@@ -51,19 +48,15 @@ const SymbolInfo = (props) => {
   });
 
   useEffect(() => {
-    symbolInfo(props.location.symbol).then((res) => {
-      setSymbol(res);
-    });
+    const fetchInitialData = async () => {
+      const data = await getInitialStockData(props.location.symbol);
 
-    getStock(props.location.symbol).then((res) => {
-      const data = mapQuoteData(res);
-      setQuoteData(data);
-    });
+      setSymbol(data.symbolInfo);
+      setQuoteData(data.quoteData);
+      setSymbolPriceData(data.symbolPriceData);
+    };
 
-    getIntradayData(props.location.symbol).then((res) => {
-      const intradayData = getClosingPrice(res);
-      setSymbolPriceData(intradayData);
-    });
+    fetchInitialData();
   }, [props.location.symbol]);
 
   useEffect(() => {

@@ -1,4 +1,9 @@
-import { getDailyData } from "../../alpha-stocks";
+import {
+  getDailyData,
+  getIntradayData,
+  getStock,
+  symbolInfo,
+} from "../../alpha-stocks";
 
 const QuoteMap = {
   "01. symbol": "symbol",
@@ -27,6 +32,32 @@ export const getClosingPrice = (data) => {
     dailyData[date] = parseFloat(data[date]["4. close"]);
   }
   return dailyData;
+};
+
+export const getInitialStockData = async (symbol) => {
+  let symbolInfoData;
+  let quoteData;
+  let symbolPriceData;
+
+  await symbolInfo(symbol).then((res) => {
+    symbolInfoData = res;
+  });
+
+  await getStock(symbol).then((res) => {
+    const data = mapQuoteData(res);
+    quoteData = data;
+  });
+
+  await getIntradayData(symbol).then((res) => {
+    const intradayData = getClosingPrice(res);
+    symbolPriceData = intradayData;
+  });
+
+  return {
+    symbolInfo: symbolInfoData,
+    quoteData: quoteData,
+    symbolPriceData: symbolPriceData,
+  };
 };
 
 export const getLastDay = (data) => {
