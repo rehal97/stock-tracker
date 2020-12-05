@@ -6,7 +6,10 @@ import React, {
   useState,
 } from "react";
 
-import Chart from "chart.js";
+import {
+  createSymbolInfoChart,
+  getTimeframeUnit,
+} from "../../utils/Chart/Chart";
 
 import {
   getLastDay,
@@ -50,13 +53,13 @@ const SymbolInfo = (props) => {
   useEffect(() => {
     const fetchInitialData = async () => {
       const data = await getInitialStockData(props.location.symbol);
-
       setSymbol(data.symbolInfo);
       setQuoteData(data.quoteData);
       setSymbolPriceData(data.symbolPriceData);
     };
 
     fetchInitialData();
+    setGraphData(getLastDay(symbolPriceData));
   }, [props.location.symbol]);
 
   useEffect(() => {
@@ -72,24 +75,7 @@ const SymbolInfo = (props) => {
         prices.push(graphData.data[key]);
       }
 
-      let timeframe;
-      let unit;
-      if (graphData.timeframe === "intraday") {
-        timeframe = 6;
-        unit = "hour";
-      } else if (graphData.timeframe === "daily") {
-        timeframe = 4;
-        unit = "day";
-      } else if (graphData.timeframe === "monthly") {
-        timeframe = 14;
-        unit = "month";
-      } else if (graphData.timeframe === "sixmonths") {
-        timeframe = 6;
-        unit = "month";
-      } else if (graphData.timeframe === "yeartoday") {
-        timeframe = 12;
-        unit = "month";
-      }
+      const res = getTimeframeUnit(graphData.timeframe);
 
       labels = labels.reverse();
       prices = prices.reverse();
@@ -98,90 +84,17 @@ const SymbolInfo = (props) => {
         chart.destroy();
       }
 
-      myChart = new Chart(myChartRef, {
-        type: "line",
-        data: {
-          labels: labels,
-          datasets: [
-            {
-              data: prices,
-              fill: false,
-              borderColor: () => {
-                if (prices[0] > prices[prices.length - 1]) return "red";
-                return "green";
-              },
-              borderWidth: 1,
-            },
-          ],
-        },
-        options: {
-          responsive: true,
-          elements: {
-            point: {
-              radius: 0,
-            },
-            line: {
-              tension: 0,
-            },
-          },
-          legend: {
-            display: false,
-          },
-          scales: {
-            xAxes: [
-              {
-                display: true,
-                ticks: {
-                  maxTicksLimit: timeframe,
-                },
-                type: "time",
-                time: {
-                  unit: unit,
-                },
-                distribution: "series",
-              },
-            ],
-            yAxes: [
-              {
-                display: false,
-              },
-            ],
-          },
-          tooltips: {
-            callbacks: {
-              label: (tooltipItem) => {
-                return "$ " + tooltipItem.yLabel.toFixed(2);
-              },
-              title: (tooltipItem) => {
-                let titleDate = new Date(tooltipItem[0].label);
+      myChart = createSymbolInfoChart(
+        myChartRef,
+        labels,
+        prices,
+        res.timeframe,
+        res.unit
+      );
 
-                let month = titleDate.getMonth() + 1;
-                let date = titleDate.getDate();
-                let hour = titleDate.getHours();
-                let minute = titleDate.getMinutes();
-
-                const titleString =
-                  month +
-                  "-" +
-                  date +
-                  " " +
-                  hour +
-                  ":" +
-                  (minute < 10 ? "0" : "") +
-                  minute;
-                return titleString;
-              },
-            },
-          },
-        },
-      });
       setChart(myChart);
     }
   }, [graphData]);
-
-  useEffect(() => {
-    setGraphData(getLastDay(symbolPriceData));
-  }, [symbolPriceData]);
 
   const toggleRangeSelectors = useCallback(
     (selected) => {
