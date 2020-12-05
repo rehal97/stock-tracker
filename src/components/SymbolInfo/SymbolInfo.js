@@ -59,11 +59,17 @@ const SymbolInfo = (props) => {
     };
 
     fetchInitialData();
-    setGraphData(getLastDay(symbolPriceData));
   }, [props.location.symbol]);
 
   useEffect(() => {
+    // set initial 1 day graph data
+    setGraphData(getLastDay(symbolPriceData));
+  }, [symbolPriceData]);
+
+  useEffect(() => {
     if (chartRef.current) {
+      console.log("ghgh");
+      console.log(graphData);
       const myChartRef = chartRef.current.getContext("2d");
       let myChart;
 
