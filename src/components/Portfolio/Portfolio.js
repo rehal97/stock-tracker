@@ -1,17 +1,18 @@
 import React, { useEffect, useMemo, useState } from "react";
+import Axios from "axios";
 
 import Container from "react-bootstrap/Container";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
-
 import Button from "react-bootstrap/Button";
 import Table from "react-bootstrap/Table";
 
 import Aux from "../../hoc/Aux/Aux";
-import Axios from "axios";
+import PortfolioFormModal from "./PortfolioForm/PortfolioFormModal";
 
 const Portfolio = () => {
   const [portfolios, setPortfolios] = useState([]);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     Axios.get("/api/portfolios")
@@ -22,12 +23,13 @@ const Portfolio = () => {
       .catch(() => {
         console.log("Could not fetch portfolios");
       });
-  }, []);
+  }, [showModal]);
 
   const getPortfolios = useMemo(() => {
     if (portfolios.length === 0) {
       return <p>You currently have no porfolios created.</p>;
     }
+
     return (
       <Aux>
         <Table striped bordered hover>
@@ -40,7 +42,7 @@ const Portfolio = () => {
           <tbody>
             {portfolios.map((portfolio) => {
               return (
-                <tr>
+                <tr key={portfolio.name}>
                   <td>{portfolio.name}</td>
                   <td>{portfolio.stocks.length}</td>
                 </tr>
@@ -52,6 +54,9 @@ const Portfolio = () => {
     );
   }, [portfolios]);
 
+  const handleShow = () => setShowModal(true);
+  const handleClose = () => setShowModal(false);
+
   return (
     <Aux>
       <Container className="mt-3">
@@ -60,7 +65,11 @@ const Portfolio = () => {
             <h2>Portfolios</h2>
           </Col>
           <Col>
-            <Button className="float-right" variant="primary">
+            <Button
+              className="float-right"
+              variant="primary"
+              onClick={handleShow}
+            >
               Create
             </Button>
           </Col>
@@ -68,7 +77,14 @@ const Portfolio = () => {
       </Container>
 
       <hr />
+
       {getPortfolios}
+
+      <PortfolioFormModal
+        showModal={showModal}
+        handleShow={handleShow}
+        handleClose={handleClose}
+      />
     </Aux>
   );
 };
