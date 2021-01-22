@@ -15,19 +15,35 @@ const Portfolio = () => {
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
+    getPortfolios();
+  }, [showModal]);
+
+  const getPortfolios = () => {
+    console.log("getting portfolios");
     Axios.get("/api/portfolios")
       .then((res) => {
-        console.log(res);
         setPortfolios(res.data);
       })
       .catch(() => {
         console.log("Could not fetch portfolios");
       });
-  }, [showModal]);
+  };
 
-  const getPortfolios = useMemo(() => {
+  const deletePortfolio = (id) => {
+    Axios.post(`/api/portfolios/delete`, null, {
+      params: {
+        id,
+      },
+    })
+      .then((res) => {
+        getPortfolios();
+      })
+      .catch((err) => console.log(err.message));
+  };
+
+  const renderPortfolios = useMemo(() => {
     if (portfolios.length === 0) {
-      return <p>You currently have no porfolios created.</p>;
+      return <p>You currently have no portfolios created.</p>;
     }
 
     return (
@@ -41,8 +57,12 @@ const Portfolio = () => {
           </thead>
           <tbody>
             {portfolios.map((portfolio) => {
+              // console.log(portfolio);
               return (
-                <tr key={portfolio.name}>
+                <tr
+                  key={portfolio._id}
+                  onClick={() => deletePortfolio(portfolio._id)}
+                >
                   <td>{portfolio.name}</td>
                   <td>{portfolio.stocks.length}</td>
                 </tr>
@@ -52,7 +72,7 @@ const Portfolio = () => {
         </Table>
       </Aux>
     );
-  }, [portfolios]);
+  }, [portfolios, deletePortfolio]);
 
   const handleShow = () => setShowModal(true);
   const handleClose = () => setShowModal(false);
@@ -78,7 +98,7 @@ const Portfolio = () => {
 
       <hr />
 
-      {getPortfolios}
+      {renderPortfolios}
 
       <PortfolioFormModal
         showModal={showModal}

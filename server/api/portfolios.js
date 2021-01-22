@@ -34,4 +34,22 @@ router.post("/", (req, res) => {
     });
 });
 
+router.post("/delete", (req, res) => {
+  let portfolioId = req.query.id;
+
+  Portfolio.deleteOne({ _id: portfolioId })
+    .then(() => {
+      console.log("Successfully deleted.");
+      res.json({
+        message: "Created portfolio successfully",
+      });
+    })
+    .catch((err) => {
+      res.status(400).json({
+        error: err,
+        message: "Error deleting portfolio",
+      });
+    });
+});
+
 module.exports = router;
