@@ -7,6 +7,13 @@
     "node": "14.x",
     "npm": "6.14.7"
   },
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "mongoose": "^5.11.5"
+  },
   "scripts": {
     "build": "rm -rf dist && webpack --mode development",
     "start": "node ./dist/server.js"
@@ -22,8 +29,5 @@
     "webpack": "^5.17.0",
     "webpack-cli": "^4.4.0",
     "webpack-node-externals": "^2.5.2"
-  },
-  "dependencies": {
-    "dotenv": "^8.2.0"
   }
 }
