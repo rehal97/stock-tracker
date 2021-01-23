@@ -53,38 +53,38 @@ const Portfolio = (props) => {
   );
 
   const renderPortfolios = useMemo(() => {
-    if (!portfolios || portfolios.length === 0) {
+    if (portfolios || portfolios.length === 0) {
+      return (
+        <Aux>
+          <Table striped bordered hover>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th># Holdings</th>
+              </tr>
+            </thead>
+            <tbody>
+              {portfolios.map((portfolio) => {
+                // console.log(portfolio);
+                return (
+                  <tr
+                    key={portfolio._id}
+                    onClick={() =>
+                      redirectToPortfolioPage(portfolio.name, portfolio._id)
+                    }
+                  >
+                    <td>{portfolio.name}</td>
+                    <td>{portfolio.holdings.length}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </Table>
+        </Aux>
+      );
+    } else {
       return <p>You currently have no portfolios created.</p>;
     }
-
-    return (
-      <Aux>
-        <Table striped bordered hover>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th># Holdings</th>
-            </tr>
-          </thead>
-          <tbody>
-            {portfolios.map((portfolio) => {
-              // console.log(portfolio);
-              return (
-                <tr
-                  key={portfolio._id}
-                  onClick={() =>
-                    redirectToPortfolioPage(portfolio.name, portfolio._id)
-                  }
-                >
-                  <td>{portfolio.name}</td>
-                  <td>{portfolio.holdings.length}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </Table>
-      </Aux>
-    );
   }, [portfolios, deletePortfolio]);
 
   const handleShow = () => setShowModal(true);
