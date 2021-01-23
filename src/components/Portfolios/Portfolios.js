@@ -22,6 +22,8 @@ const Portfolio = (props) => {
     console.log("getting portfolios");
     Axios.get("/api/portfolios")
       .then((res) => {
+        console.log(res);
+
         console.log(res.data);
         setPortfolios(res.data);
       })
