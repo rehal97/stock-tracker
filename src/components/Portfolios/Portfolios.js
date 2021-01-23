@@ -54,6 +54,7 @@ const Portfolio = (props) => {
 
   const renderPortfolios = useMemo(() => {
     if (portfolios || portfolios.length === 0) {
+      console.log(portfolios);
       return (
         <Aux>
           <Table striped bordered hover>
@@ -65,7 +66,7 @@ const Portfolio = (props) => {
             </thead>
             <tbody>
               {portfolios.map((portfolio) => {
-                // console.log(portfolio);
+                console.log(portfolio);
                 return (
                   <tr
                     key={portfolio._id}
