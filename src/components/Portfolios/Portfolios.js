@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import Axios from "axios";
 
 import Container from "react-bootstrap/Container";
@@ -10,7 +10,7 @@ import Table from "react-bootstrap/Table";
 import Aux from "../../hoc/Aux/Aux";
 import PortfolioFormModal from "./PortfolioForm/PortfolioFormModal";
 
-const Portfolio = () => {
+const Portfolio = (props) => {
   const [portfolios, setPortfolios] = useState([]);
   const [showModal, setShowModal] = useState(false);
 
@@ -41,6 +41,17 @@ const Portfolio = () => {
       .catch((err) => console.log(err.message));
   };
 
+  const redirectToPortfolioPage = useCallback(
+    (name, id) => {
+      props.history.push({
+        pathname: "/portfolio/" + name,
+        symbol: name,
+        id: id,
+      });
+    },
+    [props.history]
+  );
+
   const renderPortfolios = useMemo(() => {
     if (portfolios.length === 0) {
       return <p>You currently have no portfolios created.</p>;
@@ -61,7 +72,9 @@ const Portfolio = () => {
               return (
                 <tr
                   key={portfolio._id}
-                  onClick={() => deletePortfolio(portfolio._id)}
+                  onClick={() =>
+                    redirectToPortfolioPage(portfolio.name, portfolio._id)
+                  }
                 >
                   <td>{portfolio.name}</td>
                   <td>{portfolio.stocks.length}</td>

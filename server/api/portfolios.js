@@ -9,6 +9,16 @@ router.get("/", (req, res) => {
     .catch((err) => console.log(err));
 });
 
+router.get("/name", (req, res) => {
+  const portfolioId = req.query.id;
+  console.log("finding portfolio");
+  Portfolio.findOne({ _id: portfolioId })
+    .then((portfolio) => {
+      res.json(portfolio);
+    })
+    .catch((err) => console.log(err));
+});
+
 router.post("/", (req, res) => {
   console.log("posting portfolio");
 
@@ -35,7 +45,7 @@ router.post("/", (req, res) => {
 });
 
 router.post("/delete", (req, res) => {
-  let portfolioId = req.query.id;
+  const portfolioId = req.query.id;
 
   Portfolio.deleteOne({ _id: portfolioId })
     .then(() => {
