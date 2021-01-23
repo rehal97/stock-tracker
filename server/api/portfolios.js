@@ -62,4 +62,26 @@ router.post("/delete", (req, res) => {
     });
 });
 
+router.post("/addHolding", (req, res) => {
+  console.log(req.body.params);
+  const { id, symbol } = req.body.params;
+  console.log(id);
+  console.log(symbol);
+
+  Portfolio.findById({ _id: id })
+    .then((portfolio) => {
+      portfolio.holdings.push({ name: symbol });
+      portfolio.save();
+      res.json({
+        message: `Successfully added ${symbol} to holdings.`,
+      });
+    })
+    .catch((err) => {
+      res.status(400).json({
+        error: err,
+        message: "Error, could not add symbol to holdings.",
+      });
+    });
+});
+
 module.exports = router;

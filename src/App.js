@@ -12,13 +12,13 @@ import Portfolios from "./components/Portfolios/Portfolios";
 const App = (props) => {
   let routes = (
     <Switch>
-      <Route path="/" exact render={() => <h1>Homepage Coming Soon</h1>} />
+      <Route path="/" exact component={SymbolSearch} />
       <Route path={"/symbol"} component={SymbolInfo} />
       <Route path={"/search"} component={SymbolSearch} />
       <Route path={"/portfolio"} component={Portfolio} />
       <Route path={"/portfolios"} component={Portfolios} />
-      <Route path={"/markets"} render={() => <h1>Markets Coming Soon</h1>} />
-      <Route path={"/crypto"} render={() => <h1>Crypto Coming Soon</h1>} />
+      <Route path={"/markets"} render={() => <h1>Under Construction</h1>} />
+      <Route path={"/crypto"} render={() => <h1>Under Construction</h1>} />
       <Route
         path={"/watchlist"}
         render={() => <h1>Watchlist Coming Soon</h1>}

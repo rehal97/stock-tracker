@@ -32,6 +32,7 @@ const Portfolio = (props) => {
       return <p>You currently have 0 holdings in this portfolio.</p>;
     } else {
       const holdings = portfolio.holdings;
+      console.log(holdings);
 
       return (
         <Table striped bordered hover>
@@ -45,9 +46,14 @@ const Portfolio = (props) => {
           </thead>
           <tbody>
             {holdings.map((holding) => {
-              <tr key={holding.name}>
-                <td>{holding.name}</td>
-              </tr>;
+              return (
+                <tr key={holding}>
+                  <td>{holding}</td>
+                  <th>N/A</th>
+                  <th>N/A</th>
+                  <th>N/A</th>
+                </tr>
+              );
             })}
           </tbody>
         </Table>
