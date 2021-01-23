@@ -6,6 +6,8 @@ import React, {
   useState,
 } from "react";
 
+import Axios from "axios";
+
 import {
   createSymbolInfoChart,
   getTimeframeUnit,
@@ -26,6 +28,7 @@ import classes from "./SymbolInfo.module.css";
 import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import Container from "react-bootstrap/Container";
+import Dropdown from "react-bootstrap/Dropdown";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 
@@ -49,6 +52,7 @@ const SymbolInfo = (props) => {
     ...initialRangeState,
     oneDay: { active: true, label: "1D" },
   });
+  const [portfolios, setPortfolios] = useState({});
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -170,6 +174,51 @@ const SymbolInfo = (props) => {
     return null;
   };
 
+  useEffect(() => {
+    Axios.get("/api/portfolios").then((res) => {
+      setPortfolios(res.data);
+    });
+  }, []);
+
+  const addToPortfolio = (portfolioId) => {
+    Axios.post("/api/portfolios/addHolding", {
+      params: {
+        id: portfolioId,
+        symbol: symbol.Symbol,
+      },
+    })
+      .then((res) => {
+        console.log("added holding to portfolio");
+      })
+      .catch((err) => {
+        console.log("Could not fetch portfolio.");
+      });
+  };
+
+  const renderPortfolioDropdown = () => {
+    if (portfolios) {
+      return (
+        <Dropdown>
+          <Dropdown.Toggle variant="success" id="dropdown-basic">
+            Add to Portfolio
+          </Dropdown.Toggle>
+          <Dropdown.Menu>
+            {portfolios.map((portfolio) => {
+              return (
+                <Dropdown.Item
+                  key={portfolio._id}
+                  onClick={() => addToPortfolio(portfolio._id)}
+                >
+                  {portfolio.name}
+                </Dropdown.Item>
+              );
+            })}
+          </Dropdown.Menu>
+        </Dropdown>
+      );
+    }
+  };
+
   const renderSymbolInfo = useMemo(() => {
     if (symbol.Name) {
       return (
@@ -207,6 +256,7 @@ const SymbolInfo = (props) => {
                   {parseFloat(quoteData.high)}
                 </p>
                 <p>Volume: {parseFloat(quoteData.volume)}</p>
+                {renderPortfolioDropdown()}
               </Col>
 
               <Col>
