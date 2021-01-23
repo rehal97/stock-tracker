@@ -6,6 +6,10 @@ import Form from "react-bootstrap/Form";
 import Modal from "react-bootstrap/Modal";
 import Axios from "axios";
 
+const instance = Axios.create({
+  baseURL: "https://radiant-bastion-21109.herokuapp.com/",
+});
+
 const PortfolioFormModal = (props) => {
   // get user info from Auth0
   const { user } = useAuth0();
@@ -18,10 +22,11 @@ const PortfolioFormModal = (props) => {
       // TODO: display message to enter name
     }
 
-    Axios.post("/api/portfolios", {
-      name: portfolioName,
-      owner: user.email,
-    })
+    instance
+      .post("/api/portfolios", {
+        name: portfolioName,
+        owner: user.email,
+      })
       .then(() => {
         // portfolio created successfully
         // TODO: display success message
