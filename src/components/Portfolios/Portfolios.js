@@ -53,7 +53,7 @@ const Portfolio = (props) => {
   );
 
   const renderPortfolios = useMemo(() => {
-    if (portfolios.length === 0) {
+    if (!portfolios || portfolios.length === 0) {
       return <p>You currently have no portfolios created.</p>;
     }
 
