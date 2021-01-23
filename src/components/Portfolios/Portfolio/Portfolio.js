@@ -5,15 +5,20 @@ import Table from "react-bootstrap/Table";
 
 import Aux from "../../../hoc/Aux/Aux";
 
+const instance = Axios.create({
+  baseURL: "https://radiant-bastion-21109.herokuapp.com/",
+});
+
 const Portfolio = (props) => {
   const [portfolio, setPortfolio] = useState({});
 
   const getPortfolio = (id) => {
-    Axios.get("/api/portfolios/name", {
-      params: {
-        id,
-      },
-    })
+    instance
+      .get("/api/portfolios/name", {
+        params: {
+          id,
+        },
+      })
       .then((res) => {
         setPortfolio(res.data);
       })

@@ -10,6 +10,10 @@ import Table from "react-bootstrap/Table";
 import Aux from "../../hoc/Aux/Aux";
 import PortfolioFormModal from "./PortfolioForm/PortfolioFormModal";
 
+const instance = Axios.create({
+  baseURL: "https://radiant-bastion-21109.herokuapp.com/",
+});
+
 const Portfolio = (props) => {
   const [portfolios, setPortfolios] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -20,7 +24,8 @@ const Portfolio = (props) => {
 
   const getPortfolios = () => {
     console.log("getting portfolios");
-    Axios.get("/api/portfolios")
+    instance
+      .get("/api/portfolios")
       .then((res) => {
         console.log(res);
 
@@ -33,11 +38,12 @@ const Portfolio = (props) => {
   };
 
   const deletePortfolio = (id) => {
-    Axios.post(`/api/portfolios/delete`, null, {
-      params: {
-        id,
-      },
-    })
+    instance
+      .post(`/api/portfolios/delete`, null, {
+        params: {
+          id,
+        },
+      })
       .then((res) => {
         getPortfolios();
       })
