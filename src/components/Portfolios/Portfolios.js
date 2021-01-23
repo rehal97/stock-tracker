@@ -77,7 +77,7 @@ const Portfolio = (props) => {
                   }
                 >
                   <td>{portfolio.name}</td>
-                  <td>{portfolio.stocks.length}</td>
+                  <td>{portfolio.holdings.length}</td>
                 </tr>
               );
             })}

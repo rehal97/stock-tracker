@@ -28,12 +28,10 @@ const Portfolio = (props) => {
   }, []);
 
   const renderHoldings = useMemo(() => {
-    console.log(portfolio);
-
-    if (portfolio.stocks === undefined || portfolio.stocks.length === 0) {
+    if (portfolio.holdings === undefined || portfolio.holdings.length === 0) {
       return <p>You currently have 0 holdings in this portfolio.</p>;
     } else {
-      const holdings = portfolio.stocks;
+      const holdings = portfolio.holdings;
 
       return (
         <Table striped bordered hover>

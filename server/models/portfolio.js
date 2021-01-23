@@ -6,9 +6,9 @@ const portfolioSchema = new Schema({
     type: String,
     required: true,
   },
-  stocks: [
+  holdings: [
     {
-      type: String,
+      type: Object,
       required: false,
     },
   ],
