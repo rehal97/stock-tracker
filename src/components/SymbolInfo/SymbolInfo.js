@@ -40,6 +40,10 @@ const initialRangeState = {
   yearToDay: { active: false, label: "YTD" },
 };
 
+const instance = Axios.create({
+  baseURL: "https://radiant-bastion-21109.herokuapp.com/",
+});
+
 const SymbolInfo = (props) => {
   const chartRef = useRef();
 
@@ -175,18 +179,19 @@ const SymbolInfo = (props) => {
   };
 
   useEffect(() => {
-    Axios.get("/api/portfolios").then((res) => {
+    instance.get("/api/portfolios").then((res) => {
       setPortfolios(res.data);
     });
   }, []);
 
   const addToPortfolio = (portfolioId) => {
-    Axios.post("/api/portfolios/addHolding", {
-      params: {
-        id: portfolioId,
-        symbol: symbol.Symbol,
-      },
-    })
+    instance
+      .post("/api/portfolios/addHolding", {
+        params: {
+          id: portfolioId,
+          symbol: symbol.Symbol,
+        },
+      })
       .then((res) => {
         console.log("added holding to portfolio");
       })
