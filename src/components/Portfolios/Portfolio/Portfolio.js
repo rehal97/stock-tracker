@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Axios from "axios";
+
+import Table from "react-bootstrap/Table";
 
 import Aux from "../../../hoc/Aux/Aux";
 
@@ -25,9 +27,40 @@ const Portfolio = (props) => {
     getPortfolio(props.location.id);
   }, []);
 
+  const renderHoldings = useMemo(() => {
+    console.log(portfolio);
+
+    if (portfolio.stocks === undefined || portfolio.stocks.length === 0) {
+      return <p>You currently have 0 holdings in this portfolio.</p>;
+    } else {
+      const holdings = portfolio.stocks;
+
+      return (
+        <Table striped bordered hover>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Current Price</th>
+              <th>Change</th>
+              <th>Change (%)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {holdings.map((holding) => {
+              <tr key={holding.name}>
+                <td>{holding.name}</td>
+              </tr>;
+            })}
+          </tbody>
+        </Table>
+      );
+    }
+  }, [portfolio]);
+
   return (
     <Aux>
       <h1>{portfolio.name}</h1>
+      {renderHoldings}
     </Aux>
   );
 };
