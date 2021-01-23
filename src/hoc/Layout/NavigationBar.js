@@ -15,7 +15,7 @@ const NavigationBar = () => (
     <Navbar.Collapse id="basic-navbar-nav">
       <Nav className={classes.NavbarItems}>
         <Nav.Link href="/markets">Markets</Nav.Link>
-        <Nav.Link href="/portfolio">Portfolio</Nav.Link>
+        <Nav.Link href="/portfolios">Portfolio</Nav.Link>
         <Nav.Link href="/watchlist">Watchlist</Nav.Link>
         <Nav.Link href="/search">Search</Nav.Link>
       </Nav>
